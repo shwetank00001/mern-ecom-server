@@ -1,4 +1,5 @@
 const Products = require('../model/productModel')
+const ErrorHandler = require('../utils/errorHandler')
 
 
 async function createProduct(req,res,next){
@@ -10,7 +11,7 @@ async function createProduct(req,res,next){
 }
 
 
-const getAllProducts = async(req,res) => {
+const getAllProducts = async(req,res, next) => {
     const showProducts = await Products.find()
     res.status(200).json({
         success : true,
@@ -18,8 +19,30 @@ const getAllProducts = async(req,res) => {
     })
 }
 
-async function updateProduct(req,res){
-    let product = Products.findById(req.params.id)
+const getSingleProduct = async(req,res,next) => {
+
+
+    try {
+        const singleProd = await Products.findById(req.params.id)
+
+        if(!singleProd){
+            // res.send("Product does not exist !").status(400)
+            return next(new ErrorHandler("Product Not found", 404))
+        }
+    
+        res.status(200).json({
+            sucess: true,
+            singleProd
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+async function updateProduct(req,res, next){
+    let product = await Products.findById(req.params.id)
     if(!product){
         res.json("No Product Found !")
     }
@@ -31,7 +54,7 @@ async function updateProduct(req,res){
     })
 }
 
-async function deleteProduct(req,res){
+async function deleteProduct(req,res, next){
     const { id : prodID } = req.params
     const deleteItem = await Products.findByIdAndDelete({ _id: prodID })
 
@@ -47,5 +70,6 @@ module.exports = {
     getAllProducts,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getSingleProduct
 }
