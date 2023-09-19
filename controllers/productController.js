@@ -22,9 +22,9 @@ async function createProduct(req,res,next){
 
 const getAllProducts = async(req,res, next) => {
 
-    const apiFeature = new ApiFeatures(Products.find(), req.query )
+    const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter()
     try {
-        const showProducts = await Products.find()
+        const showProducts = await apiFeature.query
         res.status(200).json({
             success : true,
             showProducts    
@@ -37,8 +37,6 @@ const getAllProducts = async(req,res, next) => {
 const getSingleProduct = async(req,res,next) => {
     try {
         const singleProd = await Products.findById(req.params.id)
-
-        
 
         if(!singleProd){
             // res.send("Product does not exist !").status(400)
