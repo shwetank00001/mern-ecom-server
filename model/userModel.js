@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
 })
 
 // saving password in DB using bcrypt
-userSchema.pre("save",  async function(){
+userSchema.pre("save",  async function(next){
 
     if(!this.isModified("password")){
         next()
@@ -60,5 +60,12 @@ userSchema.methods.getJWTToken = function(){
         expiresIn: process.env.JWT_EXPIRE,
     })
 }
+
+
+//compare Password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  };
+  
 
 module.exports = mongoose.model("User", userSchema)

@@ -1,3 +1,4 @@
+// 2:24:03
 const User = require('../model/userModel')
 
 async function registerUser(req,res){
@@ -22,26 +23,41 @@ async function registerUser(req,res){
         console.log("User added to DB Sucessfully")
         
     } catch (error) {
-        console.log("Error Creating a User", error)
+        res.send("Error Creating a User", error).status(400)
     }
 
 }
 
 async function loginUser(req,res){
-    const { email, password } = req.body
-    if(!email || !password){
-        res.json("Enter Email or Password")
+    const { email, password } = req.body;
+
+
+  
+    if (!email || !password) {
+      return next(new ErrorHander("Please Enter Email & Password", 400));
+    }
+  
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) {
+      return next(new ErrorHander("Invalid email or password", 401));
+    }
+  
+    const isPasswordMatched = await user.comparePassword(password);
+  
+    if (!isPasswordMatched) {
+      return next(new ErrorHander("Invalid email or password", 401));
     }
 
-    const user = User.findOne( {email:email}).select("+password")
+    const token = user.getJWTToken( )
 
-    if(!user){
-            res.send("Invalid Email or Password")
-    }
-
-    
+    res.status(200).json({
+        success: true,
+        token
+    })
 }
 
 module.exports = {
-    registerUser
+    registerUser,
+    loginUser
 }
