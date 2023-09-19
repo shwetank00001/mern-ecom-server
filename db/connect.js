@@ -11,7 +11,7 @@ async function connected(){
         })
         console.log("Connected to the Database")
     } catch (error) {
-        console.log("Failed to Connect to the Mongo Database")
+        console.log("Failed to Connect to the Mongo Database", error)
     }
 }
 
