@@ -1,8 +1,6 @@
-// 1:12:42
+// 2:20:30 
 
 const Products = require('../model/productModel')
-const ErrorHandler = require('../utils/errorHandler')
-const catchAsyncError = require('../middleware/catchAsyncErrors')
 const ApiFeatures = require('../utils/apifeatures')
 
 
