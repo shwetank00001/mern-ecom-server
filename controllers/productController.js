@@ -22,12 +22,17 @@ async function createProduct(req,res,next){
 
 const getAllProducts = async(req,res, next) => {
 
-    const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter()
+
+    const resultPerPage = 5
+    const productCount = await Products.countDocuments()
+
+    const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter().pagination(resultPerPage)   
     try {
         const showProducts = await apiFeature.query
         res.status(200).json({
             success : true,
-            showProducts    
+            showProducts,
+            productCount
         })
     } catch (error) {
         console.log("Could not Get All the items, received the following error =>",{Message: error})
