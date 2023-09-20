@@ -17,7 +17,7 @@ async function registerUser(req,res, next){
         })
 
         sendToken(user, 200, res)
-        console.log("User added to DB Sucessfully")
+        console.log("User added to DB Sucessfully ")
         
     } catch (error) {
         return next(new ErrorHandler("Error Creating a User", 400));
@@ -45,7 +45,25 @@ async function loginUser(req,res, next){
     sendToken(user, 200, res);
 }
 
+
+async function logOut(req,res,next){
+
+    await res.cookie("token",  null , {
+        expires : new Date(Date.now()),
+        httpOnly : true
+    })
+
+    res.status(200).json({
+        success: true,
+        message: "Logged Out !"
+    })
+
+}
+
+
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    logOut
 }

@@ -23,7 +23,8 @@ const getAllProducts = async(req,res) => {
     const resultPerPage = 5
     const productCount = await Products.countDocuments()
 
-    const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter().pagination(resultPerPage)   
+    const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter().pagination(resultPerPage) 
+      
     try {
         const showProducts = await apiFeature.query
         res.status(200).json({
@@ -74,7 +75,7 @@ async function updateProduct(req,res, next){
 
 }
 
-async function deleteProduct(req,res, next){
+async function deleteProduct(req,res){
     try {
         const { id : prodID } = req.params
         const deleteItem = await Products.findByIdAndDelete({ _id: prodID })
