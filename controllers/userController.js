@@ -1,11 +1,14 @@
 // 2:24:03
 const User = require('../model/userModel')
+const ErrorHandler = require('../utils/errorHandler')
 
-async function registerUser(req,res){
+const sendToken = require('../utils/jwtToken')
+
+async function registerUser(req,res, next){
+
     try {
         const { name, email, password } = req.body 
-         
-        const addUser = await User.create({
+        const user = await User.create({
             name,email,password, 
             avatar: {
                 public_id : "sample",
@@ -13,48 +16,33 @@ async function registerUser(req,res){
             }
         })
 
-        
-        const token = addUser.getJWTToken( )
-
-        res.status(200).json({
-            success: true,
-            token
-        })
+        sendToken(user, 200, res)
         console.log("User added to DB Sucessfully")
         
     } catch (error) {
-        res.send("Error Creating a User", error).status(400)
-    }
+        return next(new ErrorHandler("Error Creating a User", 400));
 
+    }
 }
 
-async function loginUser(req,res){
+async function loginUser(req,res, next){
+
     const { email, password } = req.body;
-
-
-  
     if (!email || !password) {
-      return next(new ErrorHander("Please Enter Email & Password", 400));
+        return next(new ErrorHandler("Please Enter Email & Password", 400));
     }
   
     const user = await User.findOne({ email }).select("+password");
-
     if (!user) {
-      return next(new ErrorHander("Invalid email or password", 401));
+      return next(new ErrorHandler("Invalid email or password", 401));
     }
-  
+
     const isPasswordMatched = await user.comparePassword(password);
-  
     if (!isPasswordMatched) {
-      return next(new ErrorHander("Invalid email or password", 401));
+      return next(new ErrorHandler("Invalid email or password", 401));
     }
 
-    const token = user.getJWTToken( )
-
-    res.status(200).json({
-        success: true,
-        token
-    })
+    sendToken(user, 200, res);
 }
 
 module.exports = {
