@@ -7,8 +7,10 @@ const { isAuthenticatedUser } = require('../middleware/auth')
 //     isAuthenticatedUser,
 //     getAllProducts
 // })
-route.get("/products",  getAllProducts)
-route.post("/products/new", createProduct)
+
+// 2:41:05 
+route.get("/products",   getAllProducts)
+route.post("/products/new", createProduct )
 route.put("/product/:id", updateProduct)
 route.delete("/product/:id", deleteProduct)
 route.get("/product/:id", getSingleProduct)

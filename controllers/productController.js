@@ -32,6 +32,8 @@ const getAllProducts = async(req,res) => {
             showProducts,
             productCount
         })
+
+        next()
     } catch (error) {
         console.log("Could not Get All the items, received the following error =>",{Message: error})
     }
