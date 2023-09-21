@@ -10,12 +10,17 @@ app.use(cookieParser())
 // DB
 require('./db/connect')
 
+//MW
+const notFound = require('./middleware/not-found')
+
 // Routes
-const products = require('./routes/productRoutes')
+const products = require('./routes/productRoutes')  
 const user = require('./routes/userRoute')
+
 
 app.use('/api/v1', products) 
 app.use('/api/v1', user) 
+app.use(notFound)
 
 
 
