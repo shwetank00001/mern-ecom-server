@@ -5,6 +5,9 @@ const ApiFeatures = require('../utils/apifeatures')
 const ErrorHandler = require('../utils/errorHandler')
 
 async function createProduct(req,res, next){
+
+    req.body.user = req.user.id
+
     try {
         const addProducts = await Products.create(req.body)
         res.status(200).json({

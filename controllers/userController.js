@@ -1,6 +1,7 @@
-// 2:24:03
+// 3:12:56
 const User = require('../model/userModel')
 const ErrorHandler = require('../utils/errorHandler')
+const sendEmail = require('../utils/sendEmail')
 
 const sendToken = require('../utils/jwtToken')
 
@@ -60,10 +61,51 @@ async function logOut(req,res,next){
 
 }
 
+async function forgotPassword(req,res,next){
+    const user = await User.findOne({ email: req.body.email })   // we using email for  it since we are keeping the email as unique and the user will rec link on email
+
+    if(!user){
+        return next( new ErrorHandler("No User Found !", 404))
+    }
+
+    // get reset token from user schema
+
+    const resetToken = user.generateResetPasswordToken()
+    await user.save({ validateBeforeSave:false })
+
+    const resetPasswordUrl = `${req.protocol}://${req.get(" ")}/api/v1/password/reset/${resetToken}`
+
+    const message =    `Your password reset token :- \n\n ${resetPasswordUrl} \n\n If you have not requested this email, then please ignore it. `
+
+
+    try {
+        await sendEmail({
+            email : user.email,
+            subject: "Password Recovery",
+            message
+        })
+
+        res.status(200).json({
+            success: true,
+            message: `Email sent to ${user.email} Successfully !!`
+        })
+    } catch (error) {
+        user.resetPasswordToken = undefined
+        user.recentPasswordExpire = undefined
+
+        await user.save({ validateBeforeSave:false })
+
+        return ( new ErrorHandler(error.message, 500))
+    }
+     
+
+}
+
 
 
 module.exports = {
     registerUser,
     loginUser,
-    logOut
+    logOut,
+    forgotPassword
 }
