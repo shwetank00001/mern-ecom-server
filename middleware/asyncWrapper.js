@@ -8,5 +8,6 @@ const asyncWrapper = ( fn) => {
     }
 }
 
+module.exports = asyncWrapper
 
 // ignore this file= test fille

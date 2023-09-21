@@ -20,10 +20,11 @@ const user = require('./routes/userRoute')
 
 app.use('/api/v1', products) 
 app.use('/api/v1', user) 
-app.use(notFound)
 
 
 
 app.use(errorMidleware)
+// app.use(notFound)
+
 
 module.exports = app
