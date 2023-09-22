@@ -3,6 +3,7 @@ const User = require('../model/userModel')
 const ErrorHandler = require('../utils/errorHandler')
 const sendEmail = require('../utils/sendEmail')
 const sendToken = require('../utils/jwtToken')
+const crypto = require("crypto")
 
 
 async function registerUser(req,res, next){
@@ -63,10 +64,10 @@ async function forgotPassword(req,res,next){
 
     // get reset token from user schema
 
-    const resetToken = user.generateResetPasswordToken()
-    await user.save({ validateBeforeSave:false })
+    const resetToken = user.generateResetPasswordToken();
+    await user.save({ validateBeforeSave:false }); 
 
-    const resetPasswordUrl = `${req.protocol}://${req.get(" ")}/api/v1/password/reset/${resetToken}`
+    const resetPasswordUrl = `${req.protocol}://${req.get("host")}/password/reset/${resetToken}`;
 
     const message =    `Your password reset token :- \n\n ${resetPasswordUrl} \n\n If you have not requested this email, then please ignore it. `
 
@@ -89,16 +90,38 @@ async function forgotPassword(req,res,next){
         await user.save({ validateBeforeSave:false })
 
         return ( new ErrorHandler(error.message, 500))
-    }
-     
-
+    }  
 }
 
 
+async function resetPassword( req, res, next ){
+    const resetPasswordToken = crypto.createHash("sha-256").update(req.params.token).digest("hex")
+
+    const user = await User.findOne({
+            resetPasswordToken: resetPasswordToken,
+            recentPasswordExpired: { $gt: Date.now()}
+    })
+
+    if(!user){
+        return next( new ErrorHandler("Reset Password Token is invalid or has been expired.", 404))
+    }
+
+    if( req.body.password !== req.body.confirmPassword){
+        return next( new ErrorHandler("Password does not password  !", 404))
+    }
+
+    user.password = req.body.password
+    user.resetPasswordToken = undefined
+    user.recentPasswordExpire = undefined
+
+    await user.save( )
+    sendToken(user, 200, res)
+}  
 
 module.exports = {
     registerUser,
     loginUser,
     logOut,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 }
