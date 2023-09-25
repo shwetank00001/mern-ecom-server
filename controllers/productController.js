@@ -91,36 +91,35 @@ async function createProductReview( req, res, next){
       comment,
     };
   
-
-    const product = Products.findById(productId)
-
+    const product = await Products.findById(productId);
+  
     const isReviewed = product.reviews.find(
-        (rev) => rev.user.toString() === req.user._id.toString()
-      );
-    
-      if (isReviewed) {
-        product.reviews.forEach((rev) => {
-          if (rev.user.toString() === req.user._id.toString())
-            (rev.rating = rating), (rev.comment = comment)
-        });
-      } else {
-        product.reviews.push(review);
-        product.numOfReviews = product.reviews.length
-      }
-    
-      let avg = 0;
-    
+      (rev) => rev.user.toString() === req.user._id.toString()
+    );
+  
+    if (isReviewed) {
       product.reviews.forEach((rev) => {
-        avg += rev.rating
-      })
-    
-      product.ratings = avg / product.reviews.length;
-    
-      await product.save({ validateBeforeSave: false })
-    
-      res.status(200).json({
-        success: true,
-      })
+        if (rev.user.toString() === req.user._id.toString())
+          (rev.rating = rating), (rev.comment = comment);
+      });
+    } else {
+      product.reviews.push(review);
+      product.numOfReviews = product.reviews.length;
+    }
+  
+    let avg = 0;
+  
+    product.reviews.forEach((rev) => {
+      avg += rev.rating;
+    });
+  
+    product.ratings = avg / product.reviews.length;
+  
+    await product.save({ validateBeforeSave: false });
+  
+    res.status(200).json({
+      success: true,
+    });
 }
 
 
