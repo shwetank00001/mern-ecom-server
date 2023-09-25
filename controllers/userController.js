@@ -126,6 +126,10 @@ async function resetPassword( req, res, next ){
 async function getUserDetails( req, res, next ){
     const user = await User.findById(req.user.id)
 
+    if(!user){
+        return( new ErrorHandler("User does no exist"))
+    }
+
     res.status(200).json({
         success : true,
         user
@@ -174,6 +178,72 @@ async function updateProfile( req, res, next ){
     })
 }
 
+
+// get all users- via admin- read total users
+
+
+const getAllUsers = async(req, res, next) => {
+    const users = await User.find()
+
+    res.status(200).json({
+        sucess : true,
+        users
+    })
+}
+
+const getSingleUser =  async(req, res, next) => {
+    const user = await User.findById(req.params.id)
+
+    if(!user){
+        return next (new ErrorHandler(`User does not exist with the id ${req.params.id}`)   )
+    }
+
+    res.status(200).json({
+        sucess : true,
+        user
+    })
+}
+
+
+async function updateUserRole( req, res, next ){
+
+    const newUserData = {
+        name: req.body.name,
+        email: req.body.email,
+        role: req.body.role
+    }
+    // will add avatar later
+
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new : true,
+        runValidators:true,
+        useFindAndModify : false
+    })
+
+    res.status(200)
+    res.json({
+        success : true
+    })
+}
+
+async function deleteUser( req, res, next){
+
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return next(
+        new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
+      );
+    }
+
+    await user.deleteOne();
+  
+    res.status(200).json({
+      success: true,
+      message: "User Deleted Successfully",
+    });
+}
+
 module.exports = {
     registerUser,
     loginUser,
@@ -182,5 +252,11 @@ module.exports = {
     resetPassword,
     getUserDetails,
     updatePassword,
-    updateProfile
+    updateProfile,
+    getAllUsers,
+    getSingleUser,
+    updateUserRole,
+    deleteUser
+    
+
 }
