@@ -95,33 +95,92 @@ async function forgotPassword(req,res,next){
 
 
 async function resetPassword( req, res, next ){
-    const resetPasswordToken = crypto.createHash("sha-256").update(req.params.token).digest("hex")
+    const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
 
-    const user = await User.findOne({
-            resetPasswordToken: resetPasswordToken,
-            recentPasswordExpired: { $gt: Date.now()}
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorHandler("Reset Password Token is Invalid or has been expired !",400));
+  }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(new ErrorHandler("Password does not password", 400));
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  sendToken(user, 200, res);
+}  
+
+
+async function getUserDetails( req, res, next ){
+    const user = await User.findById(req.user.id)
+
+    res.status(200).json({
+        success : true,
+        user
     })
 
-    if(!user){
-        return next( new ErrorHandler("Reset Password Token is invalid or has been expired.", 404))
+}
+
+async function updatePassword( req, res, next ){
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+  
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Old password is incorrect", 400));
     }
-
-    if( req.body.password !== req.body.confirmPassword){
-        return next( new ErrorHandler("Password does not password  !", 404))
+  
+    if (req.body.newPassword !== req.body.confirmPassword) {
+      return next(new ErrorHandler("password does not match", 400));
     }
+  
+    user.password = req.body.newPassword;
+  
+    await user.save();
+  
+    sendToken(user, 200, res);
+}
 
-    user.password = req.body.password
-    user.resetPasswordToken = undefined
-    user.recentPasswordExpire = undefined
 
-    await user.save( )
-    sendToken(user, 200, res)
-}  
+async function updateProfile( req, res, next ){
+
+    const newUserData = {
+        name: req.body.name,
+        email: req.body.email,
+    }
+    // will add avatar later
+
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new : true,
+        runValidators:true,
+        useFindAndModify : false
+    })
+
+    res.status(200)
+    res.json({
+        success : true
+    })
+}
 
 module.exports = {
     registerUser,
     loginUser,
     logOut,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getUserDetails,
+    updatePassword,
+    updateProfile
 }
