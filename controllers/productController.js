@@ -80,46 +80,49 @@ async function deleteProduct(req,res){
 
 
 
+
 async function createProductReview( req, res, next){
 
-    const { rating, comment, productId } = req.body;
+    try {
+        const { rating, comment, productID} = req.body
+        const review ={
+            user : req.user._id,
+            name : req.user.name,
+            rating: Number(rating),
+            comment 
+        };
 
-    const review = {
-      user: req.user._id,
-      name: req.user.name,
-      rating: Number(rating),
-      comment,
-    };
-  
-    const product = await Products.findById(productId);
-  
-    const isReviewed = product.reviews.find(
-      (rev) => rev.user.toString() === req.user._id.toString()
-    );
-  
-    if (isReviewed) {
-      product.reviews.forEach((rev) => {
-        if (rev.user.toString() === req.user._id.toString())
-          (rev.rating = rating), (rev.comment = comment);
-      });
-    } else {
-      product.reviews.push(review);
-      product.numOfReviews = product.reviews.length;
+        const product = await Products.findById(productID)
+        const isReviewed = product.reviews.find( item => item.user.toString() === req.user._id.toString())
+
+        if(isReviewed){
+            product.reviews.forEach( item => {
+                if(item.user.toString() === req.user._id.toString()){
+                    item.rating= rating,
+                    item.comment = comment
+                }
+            })
+        }
+        else{
+            product.reviews.push(review)
+            product.numOfReviews = product.reviews.length
+        }
+        let avg = 0
+        product.ratings = product.reviews.forEach( item => {
+            avg += item.rating
+        }) / product.reviews.length
+
+
+        await product.save({ validateBeforeSave: false})
+
+        res.status(200).json({
+            success: true
+        })
+    } catch (error) {
+        console.log(error)
     }
-  
-    let avg = 0;
-  
-    product.reviews.forEach((rev) => {
-      avg += rev.rating;
-    });
-  
-    product.ratings = avg / product.reviews.length;
-  
-    await product.save({ validateBeforeSave: false });
-  
-    res.status(200).json({
-      success: true,
-    });
+
+    
 }
 
 

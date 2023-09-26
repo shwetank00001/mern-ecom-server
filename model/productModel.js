@@ -43,7 +43,8 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    reviews : [{
+    reviews : [ 
+        {
         user: {
             type: mongoose.Schema.ObjectId,
             ref: "User",
