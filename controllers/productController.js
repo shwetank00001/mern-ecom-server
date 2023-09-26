@@ -107,10 +107,13 @@ async function createProductReview( req, res, next){
             product.reviews.push(review)
             product.numOfReviews = product.reviews.length
         }
+
+
         let avg = 0
-        product.ratings = product.reviews.forEach( item => {
+         product.reviews.forEach( item => {
             avg += item.rating
-        }) / product.reviews.length
+        }) ;
+        product.ratings = avg / product.reviews.length
 
 
         await product.save({ validateBeforeSave: false})
@@ -122,9 +125,54 @@ async function createProductReview( req, res, next){
         console.log(error)
     }
 
-    
 }
     
+
+// get all reviews
+
+async function getProductReviews ( req, res, next ){
+
+    const product = Products.findById(req.query.id)
+    console.log(req.query)
+
+    if(!product){
+        return next(new ErrorHandler( "No Product found", 404))
+    }
+
+    res.status(200).send({
+        success : true,
+        reviews: product.reviews
+    })
+}
+
+async function deleteProductReview ( req, res , next){
+    const product = Products.findById(req.query.productId)
+
+    if(!product){
+        return next(new ErrorHandler( "No Product found", 404))
+    }
+
+    const reviews = product.reviews.filter( item => item._id.toString() !== req.qurey.id.toString()) 
+
+
+    let avg = 0
+    product.reviews.forEach( item => {
+       avg += item.rating
+   }) ;
+   const ratings = avg / reviews.length
+
+   const numOfReviews = reviews.length
+
+   await product.findByIdAndUpdate(req.query.productID, {
+    reviews, ratings, numOfReviews
+   }, {
+    new: true, 
+    runValidators: true,
+    useFindAndModify: false
+   })
+
+}
+
 
 module.exports = {
     getAllProducts,
@@ -132,5 +180,7 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getSingleProduct,
-    createProductReview
+    createProductReview,
+    getProductReviews,
+    deleteProductReview
 }
