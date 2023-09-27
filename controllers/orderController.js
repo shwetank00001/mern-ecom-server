@@ -37,11 +37,11 @@ exports.newOrder = async ( req, res, next ) => {
     }
 }
 
-
+// get single order using _id for a logged in user
 exports.getSingleOrder = async ( req, res, next ) => {
 
     try {
-        const order = await Order.findById(req.params. id).populate(
+        const order = await Order.findById(req.params.id).populate(
             "user", "name email"
             )
 
@@ -62,12 +62,31 @@ exports.getSingleOrder = async ( req, res, next ) => {
     }
 }
 
+
+// logged in user's orders
 exports.myOrders = async ( req, res, next ) => {
 
     try {
-        // const order = await Order.findById(req.params. id).populate(
-        //     "user", "name email"
-        //     )
+        const order = await Order.find({ user: req.user._id })
+            if(!order){
+                return next( new ErrorHandler(`No Order Found with the id: ${req.params.id}`))
+            }
+        res.status(200).json({
+            success : true,
+            order
+        })
+    } catch (error) {
+        res.send({
+            success : false,
+            message : "Can Not Get Single Order"
+        })
+    }
+}
+
+// get all orders for admin
+exports.getAllOrders = async ( req, res, next ) => {
+
+    try {
 
         const order = await Order.find({ user: req.user._id })
 
