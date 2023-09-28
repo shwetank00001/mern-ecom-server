@@ -115,14 +115,17 @@ exports.updateOrder = async ( req, res, next ) => {
 
     try {
 
-        const order = await Order.find(req.params.id)
+        const order = await Order.findById(req.params.id)
 
+        if (!order) {
+            return next(new ErrorHandler("Order not found with this Id", 404));
+          }
         if( order.orderStatus  === "Delivered"){
             return next( new ErrorHandler("Your item has already been Delivered !" , 404)) 
         }
 
         order.orderItems.forEach( async(item) => {
-            await updateStock(order.product, order.quantity)
+            await updateStock(item.product, item.quantity)
         })
 
         order.orderStatus = req.body.status;
@@ -142,7 +145,8 @@ exports.updateOrder = async ( req, res, next ) => {
         })
     } catch (error) {
         res.send({
-            success : false
+            success : false,
+            msg : error.message
         })
     }
 }
@@ -159,15 +163,15 @@ async function updateStock(id, quantity) {
 // delete order- admins
 exports.deleteOrder = async ( req, res, next ) => {
 
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findByIdAndDelete(req.params.id);
 
     if (!order) {
       return next(new ErrorHandler("Order not found with this Id", 404));
     }
   
-    await order.remove();
   
     res.status(200).json({
       success: true,
+      message : `Item with ID: ${req.params.id} has been deleted`
     });
 }
