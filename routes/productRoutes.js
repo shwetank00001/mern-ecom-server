@@ -15,6 +15,7 @@ route.put("/admin/product/:id", isAuthenticatedUser, authorizeRoles("admin"),isA
 route.delete("/admin/product/:id", isAuthenticatedUser, authorizeRoles("admin"), isAuthenticatedUser, deleteProduct)
 route.get("/product/:id", isAuthenticatedUser, getSingleProduct)
 route.put("/reviews", isAuthenticatedUser, createProductReview)
-route.get("/review", isAuthenticatedUser, getProductReviews).delete(isAuthenticatedUser, deleteProductReview)
+route.get("/review", isAuthenticatedUser, getProductReviews)
+route.delete("/review",isAuthenticatedUser, deleteProductReview)
 module.exports = route
 
