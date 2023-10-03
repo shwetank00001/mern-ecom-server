@@ -18,14 +18,14 @@ async function createProduct(req,res, next){
 
 const getAllProducts = async(req,res, next) => {
     const resultPerPage = 5
-    const productCount = await Products.countDocuments()
+    const productsCount = await Products.countDocuments()
     const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter().pagination(resultPerPage) 
     try {
         const products = await apiFeature.query
         res.status(200).json({
             success : true,
             products,
-            productCount
+            productsCount
         })
         next()
     } catch (error) {
