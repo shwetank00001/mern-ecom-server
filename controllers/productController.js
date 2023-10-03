@@ -35,14 +35,14 @@ const getAllProducts = async(req,res, next) => {
 
 const getSingleProduct = async(req,res,next) => {
     try {
-        const singleProd = await Products.findById(req.params.id)
-        if(!singleProd){
+        const product = await Products.findById(req.params.id)
+        if(!product){
             // res.send("Product does not exist !").status(400)
             return next(new ErrorHandler("Product Not found", 404))    
         }
         res.status(200).json({
             sucess: true,
-            singleProd
+            product
         })
     } catch (error) {
         res.send("Product does not exist !")
