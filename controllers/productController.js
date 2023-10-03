@@ -21,10 +21,10 @@ const getAllProducts = async(req,res, next) => {
     const productCount = await Products.countDocuments()
     const apiFeature = new ApiFeatures(Products.find(), req.query).search().filter().pagination(resultPerPage) 
     try {
-        const showProducts = await apiFeature.query
+        const products = await apiFeature.query
         res.status(200).json({
             success : true,
-            showProducts,
+            products,
             productCount
         })
         next()
