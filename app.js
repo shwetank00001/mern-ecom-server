@@ -3,6 +3,9 @@ const app = express()
 const errorMidleware = require('./middleware/errors')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+const bodyparser = require('body-parser ')
+
+const cloudinary = require('cloudinary')
 
 
 app.use(express.json())
@@ -11,6 +14,14 @@ app.use(cors())
 
 // DB
 require('./db/connect')
+
+//cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret : process.env.CLOUDINARY_API_SECRET
+})
+
 
 //MW
 const notFound = require('./middleware/not-found')
