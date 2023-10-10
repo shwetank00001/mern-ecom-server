@@ -1,25 +1,36 @@
 // 3:12:56
+// will fix cloudinary later
 const User = require('../model/userModel')
 const ErrorHandler = require('../utils/errorHandler')
 const sendEmail = require('../utils/sendEmail')
 const sendToken = require('../utils/jwtToken')
 const crypto = require("crypto")
+const cloudinary = require("cloudinary");
 
 
 async function registerUser(req,res, next){
     try {
+
+        // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        //     folder: "avatars",
+        //     width: 150,
+        //     crop: "scale",
+        //   });
+
         const { name, email, password } = req.body 
         const user = await User.create({
             name,email,password, 
             avatar: {
-                public_id : "sample",
-                url: "sample url"
+                public_id: "myCloud.public_id",
+                url: "myCloud.secure_url"
             }
         })
         sendToken(user, 200, res)
         console.log("User added to DB Sucessfully ")
     } catch (error) {
+        console.log(error)
         return next(new ErrorHandler("Error Creating a User", 400));
+
     }
 }
 

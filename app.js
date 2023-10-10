@@ -3,7 +3,9 @@ const app = express()
 const errorMidleware = require('./middleware/errors')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
-const bodyparser = require('body-parser ')
+const bodyparser = require('body-parser')
+const fileUpload = require('express-fileupload')
+require('dotenv').config()
 
 const cloudinary = require('cloudinary')
 
@@ -11,6 +13,8 @@ const cloudinary = require('cloudinary')
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
+app.use(bodyparser.urlencoded({ extended : true }))
+app.use(fileUpload())
 
 // DB
 require('./db/connect')
