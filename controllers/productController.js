@@ -2,6 +2,10 @@ const Products = require('../model/productModel')
 const ApiFeatures = require('../utils/apifeatures')
 const ErrorHandler = require('../utils/errorHandler')
 
+
+
+// will add more functions, like 1st fix cloudinary - main <3
+
 async function createProduct(req,res, next){
     req.body.user = req.user.id
     try {
