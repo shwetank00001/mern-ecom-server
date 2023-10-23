@@ -1,5 +1,5 @@
 // 3:12:56
-// will fix cloudinary later; 8:04:12
+// will fix cloudinary later 8:05
 const User = require('../model/userModel')
 const ErrorHandler = require('../utils/errorHandler')
 const sendEmail = require('../utils/sendEmail')
@@ -11,11 +11,11 @@ const cloudinary = require("cloudinary");
 async function registerUser(req,res, next){
     try {
 
-        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-            folder: "avatars",
-            width: 150,
-            crop: "scale"
-        })
+        // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        //     folder: "avatars",
+        //     width: 150,
+        //     crop: "scale",
+        //   });
 
         const { name, email, password } = req.body 
         const user = await User.create({
@@ -134,19 +134,23 @@ async function resetPassword( req, res, next ){
 }  
 
 
-async function getUserDetails( req, res, next ){
-    const user = await User.findById(req.user.id)
-
-    if(!user){
-        return( new ErrorHandler("User does no exist"))
-    }
-
-    res.status(200).json({
-        success : true,
+async function getUserDetails(req, res, next) {
+    try {
+      const user = await User.findById(req.user.id);
+  
+      if (!user) {
+        throw new ErrorHandler("User does not exist");
+      }
+  
+      res.status(200).json({
+        success: true,
         user
-    })
-
-}
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  
 
 async function updatePassword( req, res, next ){
     const user = await User.findById(req.user.id).select("+password");
