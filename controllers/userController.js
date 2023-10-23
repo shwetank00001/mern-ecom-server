@@ -1,5 +1,5 @@
 // 3:12:56
-// will fix cloudinary later
+// will fix cloudinary later; 8:04:12
 const User = require('../model/userModel')
 const ErrorHandler = require('../utils/errorHandler')
 const sendEmail = require('../utils/sendEmail')
@@ -11,11 +11,11 @@ const cloudinary = require("cloudinary");
 async function registerUser(req,res, next){
     try {
 
-        // const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        //     folder: "avatars",
-        //     width: 150,
-        //     crop: "scale",
-        //   });
+        const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+            folder: "avatars",
+            width: 150,
+            crop: "scale"
+        })
 
         const { name, email, password } = req.body 
         const user = await User.create({
