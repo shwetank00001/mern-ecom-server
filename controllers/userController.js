@@ -135,20 +135,12 @@ async function resetPassword( req, res, next ){
 
 
 async function getUserDetails(req, res, next) {
-    try {
-      const user = await User.findById(req.user.id);
-  
-      if (!user) {
-        throw new ErrorHandler("User does not exist");
-      }
-  
-      res.status(200).json({
-        success: true,
-        user
-      });
-    } catch (error) {
-      next(error);
-    }
+    const user = await User.findById(req.user.id);
+    console.log(res)
+    res.status(200).json({
+      success: true,
+      user,
+    });
   }
   
 
