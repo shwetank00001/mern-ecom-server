@@ -142,6 +142,15 @@ async function getUserDetails(req, res, next) {
       user,
     });
   }
+
+async function getUserDetails(req, res, next) {
+      const user = await User.findById(req.user.id);
+
+      res.status(200).json({
+          success: true,
+          user,
+      });
+  };
   
 
 async function updatePassword( req, res, next ){
